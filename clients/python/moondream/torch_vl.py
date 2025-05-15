@@ -5,7 +5,7 @@ from PIL import Image
 
 from .torch.moondream import MoondreamConfig, MoondreamModel
 from .torch.weights import load_weights_into_model
-from .types import (
+from .moondream_types import (
     VLM,
     Base64EncodedImage,
     CaptionOutput,

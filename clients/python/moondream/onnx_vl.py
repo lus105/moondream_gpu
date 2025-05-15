@@ -2,6 +2,7 @@ import json
 import os
 import numpy as np
 import math
+import torch
 import onnxruntime as ort
 
 from typing import Generator, Optional, Union, Dict, Any, List, Literal
@@ -12,7 +13,7 @@ from tokenizers import Tokenizer
 
 from .preprocess import create_patches, adaptive_avg_pool2d
 from .moonfile import unpack
-from .types import (
+from .moondream_types import (
     VLM,
     EncodedImage,
     OnnxEncodedImage,

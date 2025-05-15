@@ -42,3 +42,9 @@ notebooks/inference_torch.ipynb
 # open and run notebook
 notebooks/inference_onnx.ipynb
 ```
+
+#### Start local inference server (onnx)
+```bash
+# run from root
+python clients/python/moondream/cli.py serve --model "path/to/moondream-2b-int8.mf"
+```
