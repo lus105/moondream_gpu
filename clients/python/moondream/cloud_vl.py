@@ -6,7 +6,7 @@ from typing import Literal, Optional, Union
 
 from PIL import Image
 
-from .types import (
+from .moondream_types import (
     VLM,
     Base64EncodedImage,
     CaptionOutput,

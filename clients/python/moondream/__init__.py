@@ -1,7 +1,7 @@
 from typing import Optional
 
 from .cloud_vl import CloudVL
-from .types import VLM
+from .moondream_types import VLM
 
 DEFAULT_API_URL = "https://api.moondream.ai/v1"
 

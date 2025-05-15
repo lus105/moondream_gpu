@@ -1,9 +1,12 @@
 import argparse
 import sys
 from http import server
+import rootutils
 
-from .onnx_vl import OnnxVL
-from .server import MoondreamHandler
+rootutils.setup_root(__file__, indicator=['.git'], pythonpath=True)
+
+from clients.python.moondream.onnx_vl import OnnxVL
+from clients.python.moondream.server import MoondreamHandler
 
 
 def main():
