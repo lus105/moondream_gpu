@@ -302,6 +302,7 @@ class OnnxVL(VLM):
         self,
         image: Union[Image.Image, EncodedImage],
         object: str,
+        max_objects: int = 50,
     ) -> DetectOutput:
         # Check whether model supports object detection.
         if not (
@@ -326,7 +327,6 @@ class OnnxVL(VLM):
 
         objects = []
         pos = encoded_image.pos
-        max_objects = 50
 
         # Greedy decoding: check if EOS is the most likely token, and break if so.
         # Otherwise, decode three tokens for the center coordinates and size.

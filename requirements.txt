@@ -12,3 +12,5 @@ ipykernel
 rootutils
 onnxruntime-gpu
 matplotlib
+bitsandbytes
+wandb
