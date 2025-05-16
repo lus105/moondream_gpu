@@ -9,3 +9,4 @@ clients/python/moondream/torch
 
 models/model.safetensors
 models/moondream-2b-int8.mf
+wandb/

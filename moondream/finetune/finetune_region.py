@@ -21,7 +21,7 @@ from ..torch.region import (
 
 
 # This is a intended to be a basic starting point. Your optimal hyperparams and data may be different.
-MODEL_PATH = ""
+MODEL_PATH = "../../models/model.safetensors"
 LR = 3e-5
 EPOCHS = 1
 GRAD_ACCUM_STEPS = 64
@@ -186,7 +186,7 @@ def main():
 
                     # Create coordinate bin labels - unchanged
                     coord_labels = [
-                        min(max(torch.round(p * 1023), 0), 1023) for p in bb[:2]
+                        min(max(torch.round(p * 1023), 0), 1023).item() for p in bb[:2]
                     ]
 
                     # Create size bin labels using log-scale mapping
@@ -202,12 +202,12 @@ def main():
 
                     # Combine coordinate and size bin labels
                     cs_labels.extend(coord_labels + s_log2_bins)
-                    cs_labels.extend(
-                        [
-                            int(torch.clamp(torch.round(p * 1023), 0, 1023).item())
-                            for p in bb
-                        ]
-                    )
+                    # cs_labels.extend(
+                    #     [
+                    #         int(torch.clamp(torch.round(p * 1023), 0, 1023).item())
+                    #         for p in bb
+                    #     ]
+                    # )
 
                 if len(cs_emb) == 0:
                     continue
