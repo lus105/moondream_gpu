@@ -22,9 +22,9 @@ from ..torch.region import (
 
 # This is a intended to be a basic starting point. Your optimal hyperparams and data may be different.
 MODEL_PATH = "../../models/model.safetensors"
-LR = 3e-5
+LR = 1e-5
 EPOCHS = 1
-GRAD_ACCUM_STEPS = 64
+GRAD_ACCUM_STEPS = 128
 
 
 def lr_schedule(step, max_steps):
