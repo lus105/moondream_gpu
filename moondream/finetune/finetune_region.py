@@ -184,7 +184,7 @@ def main():
                     c_idx.extend([l_cs, l_cs + 1])
                     s_idx.append(l_cs + 2)
 
-                    # Create coordinate bin labels - unchanged
+                    # Create coordinate bin labels
                     coord_labels = [
                         min(max(torch.round(p * 1023), 0), 1023).item() for p in bb[:2]
                     ]
@@ -202,12 +202,6 @@ def main():
 
                     # Combine coordinate and size bin labels
                     cs_labels.extend(coord_labels + s_log2_bins)
-                    # cs_labels.extend(
-                    #     [
-                    #         int(torch.clamp(torch.round(p * 1023), 0, 1023).item())
-                    #         for p in bb
-                    #     ]
-                    # )
 
                 if len(cs_emb) == 0:
                     continue
@@ -266,8 +260,5 @@ if __name__ == "__main__":
     """
     Replace paths with your appropriate paths.
     To run: python -m moondream.finetune.finetune_region
-
-    1 epoch of fine-tuning on the example 'Waste Detection' dataset results in an
-    increase in mAP from 61.82 to 69.82.
     """
     main()
