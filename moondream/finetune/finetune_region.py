@@ -24,10 +24,10 @@ from ..torch.region import (
 
 
 # This is a intended to be a basic starting point. Your optimal hyperparams and data may be different.
-MODEL_PATH = "../../models/model.safetensors"
+MODEL_PATH = "models/model.safetensors"
 LR = 1e-5
-EPOCHS = 1
-GRAD_ACCUM_STEPS = 128
+EPOCHS = 10
+GRAD_ACCUM_STEPS = 64
 
 
 def lr_schedule(step, max_steps):
@@ -104,54 +104,40 @@ class WasteDetection(Dataset):
             "image_id": image_id,
         }
 
-class CustomWasteDetection(Dataset):
+class LocalWasteDetection(Dataset):
     def __init__(self, image_dir, annotation_dir, default_class="object"):
         self.image_dir = image_dir
         self.annotation_dir = annotation_dir
         self.default_class = default_class
 
-        self.image_paths = sorted(glob(os.path.join(image_dir, "*")))
-        self.annotation_paths = [
-            os.path.join(annotation_dir, os.path.splitext(os.path.basename(p))[0] + ".txt")
-            for p in self.image_paths
-        ]
+        image_paths = sorted(glob(os.path.join(image_dir, "*")))
+        filtered = []
+        for path in image_paths:
+            txt_path = os.path.join(annotation_dir, os.path.splitext(os.path.basename(path))[0] + ".txt")
+            if os.path.exists(txt_path):
+                with open(txt_path, "r") as f:
+                    lines = [line for line in f if len(line.strip().split()) >= 4]
+                    if len(lines) > 0:
+                        filtered.append((path, txt_path))
+
+        self.samples = filtered
 
     def __len__(self):
-        return len(self.image_paths)
+        return len(self.samples)
 
     def __getitem__(self, idx):
-        image_path = self.image_paths[idx]
-        annot_path = self.annotation_paths[idx]
-
-        # Load image
+        image_path, annot_path = self.samples[idx]
         image = Image.open(image_path).convert("RGB")
 
         boxes = []
-        labels = []
+        with open(annot_path, "r") as f:
+            for line in f:
+                parts = line.strip().split()
+                bbox = list(map(float, parts[0:4]))
+                boxes.append(bbox)
 
-        # Load annotations if the file exists
-        if os.path.exists(annot_path):
-            with open(annot_path, "r") as f:
-                for line in f:
-                    parts = line.strip().split()
-                    if len(parts) >= 4:
-                        bbox = list(map(float, parts[0:4]))  # x_min y_min x_max y_max
-                        boxes.append(bbox)
-                        labels.append(self.default_class)
-
-        # Structure like original dataset: group by label (only one class here)
-        objects = {}
-        for box, label in zip(boxes, labels):
-            objects.setdefault(label, []).append(box)
-
-        flat_boxes = []
-        class_names = []
-        for label, box_list in objects.items():
-            for b in box_list:
-                flat_boxes.append(b)
-                class_names.append(label)
-
-        flat_boxes = torch.as_tensor(flat_boxes, dtype=torch.float16) if flat_boxes else torch.empty((0, 4), dtype=torch.float16)
+        flat_boxes = torch.as_tensor(boxes, dtype=torch.float16)
+        class_names = [self.default_class] * len(flat_boxes)
         image_id = torch.tensor([idx], dtype=torch.int64)
 
         return {
