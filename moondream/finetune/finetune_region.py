@@ -4,6 +4,9 @@ import torch.nn.functional as F
 import math
 from safetensors.torch import save_file
 import datasets
+import os
+from glob import glob
+from PIL import Image
 
 from tqdm import tqdm
 from bitsandbytes.optim import AdamW
@@ -101,6 +104,62 @@ class WasteDetection(Dataset):
             "image_id": image_id,
         }
 
+class CustomWasteDetection(Dataset):
+    def __init__(self, image_dir, annotation_dir, default_class="object"):
+        self.image_dir = image_dir
+        self.annotation_dir = annotation_dir
+        self.default_class = default_class
+
+        self.image_paths = sorted(glob(os.path.join(image_dir, "*")))
+        self.annotation_paths = [
+            os.path.join(annotation_dir, os.path.splitext(os.path.basename(p))[0] + ".txt")
+            for p in self.image_paths
+        ]
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        image_path = self.image_paths[idx]
+        annot_path = self.annotation_paths[idx]
+
+        # Load image
+        image = Image.open(image_path).convert("RGB")
+
+        boxes = []
+        labels = []
+
+        # Load annotations if the file exists
+        if os.path.exists(annot_path):
+            with open(annot_path, "r") as f:
+                for line in f:
+                    parts = line.strip().split()
+                    if len(parts) >= 4:
+                        bbox = list(map(float, parts[0:4]))  # x_min y_min x_max y_max
+                        boxes.append(bbox)
+                        labels.append(self.default_class)
+
+        # Structure like original dataset: group by label (only one class here)
+        objects = {}
+        for box, label in zip(boxes, labels):
+            objects.setdefault(label, []).append(box)
+
+        flat_boxes = []
+        class_names = []
+        for label, box_list in objects.items():
+            for b in box_list:
+                flat_boxes.append(b)
+                class_names.append(label)
+
+        flat_boxes = torch.as_tensor(flat_boxes, dtype=torch.float16) if flat_boxes else torch.empty((0, 4), dtype=torch.float16)
+        image_id = torch.tensor([idx], dtype=torch.int64)
+
+        return {
+            "image": image,
+            "boxes": flat_boxes,
+            "class_names": class_names,
+            "image_id": image_id,
+        }
 
 def main():
     if torch.cuda.is_available():
