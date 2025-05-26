@@ -12,3 +12,6 @@ moondream_finetune.safetensors
 models/model.safetensors
 models/moondream-2b-int8.mf
 wandb/
+build/
+dist/
+*.spec
