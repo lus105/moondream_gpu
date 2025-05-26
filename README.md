@@ -46,5 +46,13 @@ notebooks/inference_onnx.ipynb
 #### Start local inference server (onnx)
 ```bash
 # run from root
-python clients/python/moondream/cli.py serve --model "path/to/moondream-2b-int8.mf"
+python clients/python/moondream/cli.py --model "path/to/moondream-2b-int8.mf"
+```
+
+#### Create .exe
+```bash
+pip install pyinstaller
+# navigate to clients/python/moondream and run:
+pyinstaller cli.py --name=moondream_VLM --hidden-import=torch --hidden-import=onnxruntime --hidden-import=safetensors
+# copy generated dist/ folder and model for further use
 ```

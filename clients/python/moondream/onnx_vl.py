@@ -11,9 +11,9 @@ from io import BytesIO
 from PIL import Image
 from tokenizers import Tokenizer
 
-from .preprocess import create_patches, adaptive_avg_pool2d
-from .moonfile import unpack
-from .moondream_types import (
+from preprocess import create_patches, adaptive_avg_pool2d
+from moonfile import unpack
+from moondream_types import (
     VLM,
     EncodedImage,
     OnnxEncodedImage,

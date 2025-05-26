@@ -5,7 +5,7 @@ from PIL import Image
 
 from .torch.moondream import MoondreamConfig, MoondreamModel
 from .torch.weights import load_weights_into_model
-from .moondream_types import (
+from moondream_types import (
     VLM,
     Base64EncodedImage,
     CaptionOutput,
@@ -15,7 +15,7 @@ from .moondream_types import (
     QueryOutput,
     SamplingSettings,
 )
-from .version import __version__
+from version import __version__
 
 
 class TorchVL(VLM):

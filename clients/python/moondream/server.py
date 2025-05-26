@@ -8,7 +8,7 @@ from typing import Any, Dict
 
 from PIL import Image
 
-from .onnx_vl import OnnxVL
+from onnx_vl import OnnxVL
 
 # Configure logging
 logging.basicConfig(
