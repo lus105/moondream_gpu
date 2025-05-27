@@ -1,18 +1,6 @@
-import os
 import sys
 import argparse
 from http import server
-import rootutils
-
-if getattr(sys, 'frozen', False):
-    # Running from PyInstaller bundle
-    root_dir = os.path.dirname(sys.executable)
-else:
-    # Running from source
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Set up rootutils using resolved root
-rootutils.setup_root(root_dir, indicator=['.root'], pythonpath=True)
 
 from onnx_vl import OnnxVL
 from server import MoondreamHandler

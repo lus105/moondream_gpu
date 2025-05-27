@@ -1,10 +1,13 @@
+import os
 import base64
+import time
 import io
 import json
 import logging
 import urllib.parse
 from http import server
 from typing import Any, Dict
+import threading
 
 from PIL import Image
 
@@ -61,12 +64,23 @@ class MoondreamHandler(server.BaseHTTPRequestHandler):
 
             payload = json.loads(self.rfile.read(content_length))
 
+            parsed_path = urllib.parse.urlparse(self.path)
+            endpoint = parsed_path.path
+
+            if endpoint == "/shutdown":
+                self.send_json_response({"message": "Shutting down server..."})
+                def shutdown_server():
+                    time.sleep(1)
+                    logger.info("Shutting down server from /shutdown endpoint.")
+                    self.server.shutdown()
+                    os._exit(0)  # Safer in PyInstaller than sys.exit()
+
+                threading.Thread(target=shutdown_server).start()
+                return
+            
             image_url = payload.get("image_url")
             if not image_url:
                 raise ValueError("image_url is required")
-
-            parsed_path = urllib.parse.urlparse(self.path)
-            endpoint = parsed_path.path
 
             # Convert base64 image for all endpoints
             image = self.decode_base64_image(image_url)
